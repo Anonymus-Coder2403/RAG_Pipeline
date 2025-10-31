@@ -1,0 +1,11 @@
+Deep Learning is a new area of Machine Learning research, which has been introduced with the objective of moving Machine Learning closer to one of its original goals: Artificial Intelligence. See these course notes for a brief introduction to Machine Learning for AI and an introduction to Deep Learning algorithms.
+
+Deep Learning is about learning multiple levels of representation and abstraction that help to make sense of data such as images, sound, and text. For more about deep learning algorithms, see for example:
+
+The monograph or review paper Learning Deep Architectures for AI (Foundations & Trends in Machine Learning, 2009).
+The ICML 2009 Workshop on Learning Feature Hierarchies webpage has a list of references.
+The LISA public wiki has a reading list and a bibliography.
+Geoff Hinton has readings from 2009’s NIPS tutorial.
+The tutorials presented here will introduce you to some of the most important deep learning algorithms and will also show you how to run them using Theano. Theano is a python library that makes writing deep learning models easy, and gives the option of training them on a GPU.
+
+The algorithm tutorials have some prerequisites. You should know some python, and be familiar with numpy. Since this tutorial is about using Theano, you should read over the Theano basic tutorial first. Once you’ve done that, read through our Getting Started chapter – it introduces the notation, and downloadable datasets used in the algorithm tutorials, and the way we do optimization by stochastic gradient descent.
