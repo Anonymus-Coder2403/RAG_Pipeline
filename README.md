@@ -1,87 +1,63 @@
-# Traditional RAG (Retrieval-Augmented Generation) Pipeline
+# RAG (Retrieval Augmented Generation) Pipeline Project
 
-This repository implements a **Retrieval-Augmented Generation (RAG)** pipeline for processing and analyzing both PDF and text documents.  
-The project demonstrates document ingestion, text chunking, embedding generation, and vector database storage for efficient semantic retrieval.
-
-The **core of the project** lies in the [`notebook/pdf_loader.ipynb`](notebook/pdf_loader.ipynb), where PDFs are parsed, chunked, and transformed into vector embeddings used in retrieval tasks.
-
----
+A production-ready, modular RAG pipeline for answering questions from PDF documents using semantic search and Google Gemini AI.
 
 ## 📁 Project Structure
-
 ```
 RAG/
+├── src/                        # Modular source code
+│   ├── __init__.py            # Package initialization
+│   ├── data_loader.py         # PDF loading and chunking
+│   ├── embedding.py           # Embedding generation
+│   ├── vectorstore.py         # ChromaDB vector storage
+│   ├── search.py              # Document retrieval
+│   ├── llm.py                 # Gemini LLM wrapper
+│   └── rag_pipeline.py        # Complete RAG orchestration
 ├── data/
-│ ├── pdf/ # PDF documents for processing
-│ ├── text_files/ # Text files containing ML/DL content
-│ └── vector_store/ # Chroma/FAISS vector storage (ignored in Git)
+│   ├── pdf/                   # PDF documents for processing
+│   ├── text_files/            # Text files containing ML/DL content
+│   └── vector_store/          # Persistent vector database
 ├── notebook/
-│ ├── document.ipynb # Text document processing pipeline
-│ └── pdf_loader.ipynb # Core PDF processing and embedding pipeline
-├── main.py # script for RAG pipeline
-├── requirements.txt # Python dependencies
-├── pyproject.toml # Build configuration
-├── README.md # Project documentation
-└── .gitignore, .gitattributes, etc.
+│   ├── document.ipynb         # Document processing notebook
+│   └── pdf_loader.ipynb       # PDF processing and embedding pipeline
+├── example.py                 # Usage examples
+├── .env                       # Environment variables (API keys)
+├── .env.example               # Template for environment variables
+├── requirements.txt           # Python dependencies
+└── README.md
 ```
 
+## 🚀 Overview
+This project implements a complete RAG (Retrieval Augmented Generation) pipeline for processing PDF documents and answering questions using AI. The system combines semantic search with Google Gemini for accurate, source-grounded answers.
 
----
+## ✨ Key Features
+- **📄 PDF Processing**: Automatic loading and chunking of PDF documents
+- **🔍 Semantic Search**: Vector-based similarity search using sentence transformers
+- **💾 Persistent Storage**: ChromaDB for efficient vector storage and retrieval
+- **🤖 AI-Powered Answers**: Google Gemini 2.5 Flash for generating accurate, grounded responses
+- **🏗️ Modular Design**: Clean, maintainable code split into focused modules
+- **📌 Source Citation**: Automatic tracking and citation of source documents
+- **⚙️ Configurable**: Easy to customize embedding models, chunk sizes, and generation parameters
 
-## Overview
-
-This project is built to demonstrate **how retrieval-based systems enhance LLMs** by augmenting generation with external document knowledge.
-
-The pipeline:
-1. **Loads and parses PDFs or text files**
-2. **Chunks long content** into semantically meaningful sections
-3. **Generates embeddings** using a transformer model
-4. **Stores them in a vector database** (ChromaDB)
-5. **Retrieves** relevant document chunks during queries
-
----
-
-## Core Notebook: `pdf_loader.ipynb`
-
-### 🔍 What It Does
-| Step | Description |
-|------|--------------|
-| **1️⃣ Load PDFs** | Iterates through all `.pdf` files in `data/pdf/` and extracts clean text. |
-| **2️⃣ Clean & Preprocess** | Removes headers, footers, and formatting artifacts. |
-| **3️⃣ Chunk Text** | Splits text into overlapping chunks (default: 1000 characters, 200 overlap) using `RecursiveCharacterTextSplitter`. |
-| **4️⃣ Generate Embeddings** | Uses `sentence-transformers` (`all-MiniLM-L6-v2`) to convert text chunks into numerical vectors. |
-| **5️⃣ Store in ChromaDB** | Embeddings are saved into a local Chroma vector store (`data/vector_store/chroma.sqlite3`). |
-| **6️⃣ Query Examples** | Demonstrates how to perform semantic search queries on stored vectors. |
-
-### 💡 Why This Notebook Matters
-- It forms the **data foundation** of the entire RAG system.  
-- All retrieval, query-answering, and augmentation depend on the processed embeddings here.  
-- Shows how to connect **document parsing → vector storage → LLM context retrieval** in a single pipeline.
-
----
-
-## Features
-
-### 🧾 Document Processing
-- PDF and plain text file ingestion  
-- Metadata extraction and management  
-- Support for multiple document types  
-
-### Text Processing
-- Recursive character-based text splitting  
-- Customizable chunk size and overlap  
-- Configurable separators for flexible splitting  
-
-### Embedding Generation
-- Integrated with `sentence-transformers` (`all-MiniLM-L6-v2`)  
-- Stores embeddings in **ChromaDB** (local vector database)  
-- Supports cosine similarity search  
-
----
+## 🎯 Architecture
+```
+📄 PDF Documents
+    ↓
+🔪 Text Chunking (RecursiveCharacterTextSplitter)
+    ↓
+🧠 Embeddings (all-MiniLM-L6-v2, 384 dimensions)
+    ↓
+💾 Vector Store (ChromaDB - Persistent)
+    ↓
+🔍 Semantic Search (Cosine Similarity)
+    ↓
+🤖 Answer Generation (Gemini 2.5 Flash)
+    ↓
+✨ Final Answer with Citations
+```
 
 ## 📋 Requirements
-
-```txt
+```python
 langchain-community
 langchain-text-splitters
 sentence-transformers
@@ -89,119 +65,253 @@ chromadb
 numpy
 scikit-learn
 pypdf
+google-generativeai
+python-dotenv
 ```
 
 ## 💻 Installation
+
+### 1. Clone and Setup
 ```bash
 # Clone the repository
 git clone https://github.com/Anonymus-Coder2403/RAG_Pipeline.git
 cd RAG_Pipeline
 
-# Create and activate virtual environment (Windows)
-python -m venv venv
-.\venv\Scripts\activate
-# or (Linux/macOS)
-source venv/bin/activate
+# Create and activate virtual environment
+python -m venv .venv
+
+# Windows:
+.venv\Scripts\activate
+
+# Linux/Mac:
+source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-## 🔧 Usage
-### 1. Document Processing
-```python
-from pathlib import Path
-from langchain_community.document_loaders import PyPDFLoader
+### 2. Configure API Key
+```bash
+# Copy environment template
+cp .env.example .env
 
-# Process all PDF documents
-pdf_documents = process_all_pdfs("data/pdf/")
+# Edit .env and add your Gemini API key:
+# GEMINI_API_KEY=your_api_key_here
 ```
 
-### 2. Text Splitting
-```python
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+Get your Gemini API key from: https://aistudio.google.com/app/apikey
 
-# Split documents into manageable chunks
-chunks = split_documents(documents, chunk_size=1000, chunk_overlap=200)
+## 🔧 Quick Start
+
+### Option 1: Using Modular Code (Recommended)
+
+```python
+from src import (
+    PDFDocumentLoader,
+    EmbeddingManager,
+    VectorStore,
+    RAGRetriever,
+    GeminiLLM,
+    RAGPipeline
+)
+
+# 1. Load and process documents
+loader = PDFDocumentLoader(chunk_size=1000, chunk_overlap=200)
+chunks = loader.load_and_split("data/pdf")
+
+# 2. Generate embeddings
+embedding_manager = EmbeddingManager()
+texts = [doc.page_content for doc in chunks]
+embeddings = embedding_manager.generate_embeddings(texts)
+
+# 3. Store in vector database
+vector_store = VectorStore()
+vector_store.add_documents(chunks, embeddings)
+
+# 4. Set up RAG pipeline
+retriever = RAGRetriever(vector_store, embedding_manager)
+llm = GeminiLLM()
+rag = RAGPipeline(retriever, llm)
+
+# 5. Ask questions!
+result = rag.answer("What are news values?", top_k=3)
+rag.display_result(result)
 ```
 
-### 3. Embedding Generation
-```python
-from sentence_transformers import SentenceTransformer
+### Option 2: Quick Query (Using Existing Vector Store)
 
-# Initialize embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode(["sample text chunk"])
+If you've already processed documents:
+
+```python
+from src import EmbeddingManager, VectorStore, RAGRetriever, GeminiLLM, RAGPipeline
+
+# Connect to existing vector store
+embedding_manager = EmbeddingManager()
+vector_store = VectorStore()
+retriever = RAGRetriever(vector_store, embedding_manager)
+llm = GeminiLLM()
+rag = RAGPipeline(retriever, llm)
+
+# Ask questions
+result = rag.answer("Your question here", top_k=3)
+print(result['answer'])
 ```
 
-## 📊 Project Components
-1. **Document Loader (`document.ipynb`)**
-   - Handles text file ingestion
-   - Document structure management
-   - Basic text processing
+### Option 3: Run Example Script
 
-2. **PDF Pipeline (`notebook/pdf_loader.ipynb`)**
-   - PDF document processing
-   - Text chunking
-   - Embedding generation
-   - Vector database integration
-
-## 🔍 Code Examples
-### PDF Processing
-```python
-def process_all_pdfs(pdf_directory):
-    """Process all PDF files in a directory"""
-    all_documents = []
-    pdf_dir = Path(pdf_directory)
-    for pdf_file in pdf_dir.glob("*.pdf"):
-        loader = PyPDFLoader(str(pdf_file))
-        docs = loader.load()
-        all_documents.extend(docs)
-    return all_documents
-
+```bash
+python example.py
 ```
 
-### Text Splitting
-```python
-def split_documents(documents, chunk_size=1000, chunk_overlap=200):
-    """Split documents into smaller chunks"""
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap
-    )
-    split_docs = text_splitter.split_documents(documents)
-    return split_docs
+## 📚 Module Documentation
 
+### 📄 `PDFDocumentLoader`
+Handles loading and chunking PDF documents.
+
+**Parameters:**
+- `chunk_size` (int): Maximum size of text chunks (default: 1000)
+- `chunk_overlap` (int): Overlap between chunks (default: 200)
+- `separators` (list): Custom separators for splitting (default: ["\n\n", "\n", " ", ""])
+
+**Methods:**
+- `load_pdfs(pdf_directory)`: Load all PDFs from a directory
+- `split_documents(documents)`: Split documents into chunks
+- `load_and_split(pdf_directory)`: Combined load and split operation
+
+### 🧠 `EmbeddingManager`
+Generates embeddings using SentenceTransformers.
+
+**Parameters:**
+- `model_name` (str): HuggingFace model name (default: "all-MiniLM-L6-v2")
+
+**Methods:**
+- `generate_embeddings(texts, show_progress)`: Generate embeddings for text list
+- `get_embedding_dimension()`: Get embedding dimension
+
+### 💾 `VectorStore`
+Manages ChromaDB vector storage.
+
+**Parameters:**
+- `collection_name` (str): Name of collection (default: "pdf_documents")
+- `persist_directory` (str): Storage directory (default: "../data/vector_store")
+
+**Methods:**
+- `add_documents(documents, embeddings)`: Add documents to store
+- `get_collection_stats()`: Get collection statistics
+- `clear_collection()`: Delete all documents
+
+### 🔍 `RAGRetriever`
+Handles semantic search and document retrieval.
+
+**Parameters:**
+- `vector_store`: VectorStore instance
+- `embedding_manager`: EmbeddingManager instance
+
+**Methods:**
+- `retrieve(query, top_k, score_threshold)`: Retrieve relevant documents
+
+### 🤖 `GeminiLLM`
+Wrapper for Google Gemini API.
+
+**Parameters:**
+- `model_name` (str): Gemini model (default: "gemini-2.5-flash")
+- `temperature` (float): Sampling temperature (default: 0.1)
+- `max_output_tokens` (int): Max response length (default: 500)
+- `top_p` (float): Nucleus sampling (default: 0.95)
+- `top_k` (int): Top-k sampling (default: 40)
+- `api_key` (str): Google AI API key (optional)
+
+**Methods:**
+- `generate(prompt, max_retries)`: Generate response with retry logic
+- `list_available_models()`: List available Gemini models
+
+### 🔗 `RAGPipeline`
+Complete RAG pipeline orchestrator.
+
+**Parameters:**
+- `retriever`: RAGRetriever instance
+- `llm`: GeminiLLM instance
+
+**Methods:**
+- `answer(query, top_k)`: Complete RAG pipeline (retrieve + generate)
+- `display_result(result)`: Format and display result
+
+## ⚙️ Configuration
+
+### Embedding Models
+Choose different embedding models from HuggingFace:
+
+- **`all-MiniLM-L6-v2`** (default): Fast, general-purpose (384 dim)
+- **`BAAI/bge-large-en-v1.5`**: High quality for technical content (1024 dim)
+- **`sentence-transformers/all-mpnet-base-v2`**: Balanced quality/speed (768 dim)
+
+### Gemini Models
+Available models (check with `GeminiLLM.list_available_models()`):
+
+- **`gemini-2.5-flash`** (default): Fast, cost-effective
+- **`gemini-2.5-pro`**: Higher quality, slower
+- **`gemini-2.0-flash`**: Alternative fast model
+
+### RAG Parameters
+
+**Chunking:**
+- `chunk_size`: 1000 characters (balance between context and specificity)
+- `chunk_overlap`: 200 characters (maintains context across chunks)
+
+**Retrieval:**
+- `top_k`: 3-5 chunks (more = more context but higher cost)
+- `score_threshold`: 0.0-1.0 (filter low-similarity results)
+
+**Generation:**
+- `temperature`: 0.1 (low for factual responses)
+- `max_output_tokens`: 500 (adjust based on needs)
+
+## 🚨 Troubleshooting
+
+### API Key Issues
 ```
-## Example Query (after embedding)
-```python
-from chromadb import Client
-
-client = Client()
-collection = client.get_or_create_collection("pdf_embeddings")
-
-query = "What is the key idea of the paper?"
-results = collection.query(query_texts=[query], n_results=3)
-print(results)
-
+Error: GEMINI_API_KEY not found
+Solution: Create .env file with GEMINI_API_KEY=your_key_here
 ```
 
-## Technologies Used
+### Model Not Found
+```
+Error: 404 models/gemini-xxx not found
+Solution: Run GeminiLLM.list_available_models() to see available models
+```
 
-   - Python 3.10+
-   - LangChain (document loaders, text splitting)
-   - Sentence Transformers (all-MiniLM-L6-v2 embeddings)
-   - ChromaDB (vector database)
-   - NumPy & scikit-learn (utility math)
-   - PyPDF / PDFMiner (PDF parsing)
+### Low Similarity Scores
+```
+Issue: Retrieval returns low similarity scores
+Solutions:
+- Check if embedding model matches document type
+- Try different embedding model (e.g., BAAI/bge-large-en-v1.5)
+- Adjust chunk_size and chunk_overlap
+- Add more relevant documents
+```
 
+## 💡 Performance Tips
 
-## 📝 Notes
-- Ensure PDF files are placed in the `data/pdf` directory
-- Text files should be placed in `data/text_files`
-- Default model: `all-MiniLM-L6-v2`
-- Default chunk size: 1000 characters
-- Default chunk overlap: 200 characters
+1. **Vector Store Persistence**: ChromaDB automatically persists data - no need to re-process documents each run
+2. **Batch Processing**: Process multiple PDFs at once for efficiency
+3. **Embedding Model Selection**:
+   - Use `all-MiniLM-L6-v2` for general documents
+   - Use `BAAI/bge-large-en-v1.5` for technical/academic content
+4. **Chunk Size Optimization**:
+   - Smaller chunks (500-800): More precise retrieval
+   - Larger chunks (1000-1500): More context per chunk
+
+## 🔍 Core Notebook: `pdf_loader.ipynb`
+
+The [`notebook/pdf_loader.ipynb`](notebook/pdf_loader.ipynb) contains the development process showing:
+- PDF loading and text extraction
+- Text chunking with RecursiveCharacterTextSplitter
+- Embedding generation using sentence-transformers
+- ChromaDB vector storage setup
+- Gemini LLM integration
+- Complete RAG pipeline implementation
+
+This forms the foundation of the entire RAG system, demonstrating how document parsing, vector storage, and LLM context retrieval work together.
 
 ## 🤝 Contributing
 1. Fork the repository
@@ -210,32 +320,29 @@ print(results)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
-## Reviewer’s Guide
-- If you are reviewing this repository:
-
-- Start with: notebook/pdf_loader.ipynb — this contains the main pipeline logic.
-
-- Then see: notebook/document.ipynb — shows plain text handling.
-
-- Finally: main.py — orchestrates RAG pipeline end-to-end.
-
-- Tip: If GitHub fails to render the notebook, open it locally in Jupyter or VS Code.
-
-```bash
-jupyter notebook notebook/pdf_loader.ipynb
-```
-x
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👥 Authors
 - Yash Kumar (@Anonymus-Coder2403)
 
-## Future Enhancements
+## 🙏 Acknowledgments
 
-- Migrate vector storage & data files to some cloud storage like AWS S3 or GCP 
-- Integrate LLM querying layer for contextual answers
+This project uses the following amazing technologies:
+
+- **[LangChain](https://www.langchain.com/)**: Document loading and processing
+- **[Sentence Transformers](https://www.sbert.net/)**: State-of-the-art embedding generation
+- **[ChromaDB](https://www.trychroma.com/)**: Efficient vector database
+- **[Google Gemini](https://ai.google.dev/)**: AI-powered answer generation
+
+## 📖 Additional Resources
+
+- [Original Notebook](notebook/pdf_loader.ipynb): Development notebook with step-by-step process
+- [Example Script](example.py): Ready-to-run usage examples
+- [API Documentation](https://ai.google.dev/docs): Google Gemini API docs
 
 ---
-*For more information, please refer to the individual notebook documentation.*
+
+⭐ **Star this repo if you found it helpful!**
+
+**Built with ❤️ for the open-source community**
