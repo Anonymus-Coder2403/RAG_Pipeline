@@ -7,4 +7,3 @@ embeddings/**/*.npz filter=lfs diff=lfs merge=lfs -text
 models/**/*.pt filter=lfs diff=lfs merge=lfs -text
 models/**/*.pth filter=lfs diff=lfs merge=lfs -text
 *.ckpt filter=lfs diff=lfs merge=lfs -text
-data/**/*.pdf filter=lfs diff=lfs merge=lfs -text
