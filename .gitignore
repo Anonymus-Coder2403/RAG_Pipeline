@@ -7,13 +7,18 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
 __pycache__/
 *.pyc
 .venv/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Project secrets
+.env
+
+# Data (keep large/binary out of Git)
 data/vector_store/
 data/**/*.bin
 data/**/*.pdf
