@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Future Enhancements
 
-- Migrate vector storage to AWS S3 + Pinecone or Weaviate Cloud
+- Migrate vector storage & data files to some cloud storage like AWS S3 or GCP 
 - Integrate LLM querying layer for contextual answers
 
 ---
