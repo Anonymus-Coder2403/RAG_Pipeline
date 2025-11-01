@@ -133,7 +133,7 @@ def split_documents(documents, chunk_size=1000, chunk_overlap=200):
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👥 Authors
-- Your Name (@yourusername)
+- Yash Kumar (@yourusername)
 
 ## 🙏 Acknowledgments
 - LangChain Community
