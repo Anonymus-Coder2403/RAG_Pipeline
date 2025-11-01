@@ -1,4 +1,4 @@
-# RAG (Retrieval Augmented Generation) Pipeline Project
+# Traditional RAG (Retrieval Augmented Generation) Pipeline 
 
 ## 📁 Project Structure
 ```
