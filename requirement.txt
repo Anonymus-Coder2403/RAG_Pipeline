@@ -1,10 +1,18 @@
-langchain
-langchain-core
-langchain-community
-pypdf
-pymupdf
-sentence-transformers
-faiss-cpu
-chromadb
-python-dotenv
-google-generativeai
+# Core RAG Dependencies
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+pypdf>=3.17.0
+pymupdf>=1.23.0
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+chromadb>=0.4.22
+python-dotenv>=1.0.0
+google-generativeai>=0.3.0
+
+# Web Interface
+streamlit>=1.31.0
+
+# Additional utilities
+python-docx>=1.1.0
+Pillow>=10.0.0

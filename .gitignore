@@ -8,18 +8,39 @@ wheels/
 
 # Virtual environments
 .venv/
-__pycache__/
+venv/
+env/
+ENV/
 *.pyc
-.venv/
 .DS_Store
 Thumbs.db
 .vscode/
 
 # Project secrets
 .env
+*.pem
+*.ppk
+*.key
 
 # Data (keep large/binary out of Git)
 data/vector_store/
+data/uploads/
+data/pdf/
 data/**/*.bin
 data/**/*.pdf
 data/*.sqlite3
+
+# Model cache (sentence-transformers downloads)
+models/
+.cache/
+
+# Large PDFs in root (test files)
+*.pdf
+
+# System files
+packages.microsoft.gpg
+
+# IDE
+.idea/
+*.swp
+*.swo

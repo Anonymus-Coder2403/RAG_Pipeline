@@ -55,23 +55,37 @@ class GeminiLLM:
             "max_output_tokens": max_output_tokens,
         }
 
-        # Safety settings
+        # Safety settings - relaxed for document Q&A
         self.safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
         ]
 
         # Initialize model
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config=self.generation_config,
-            safety_settings=self.safety_settings
-        )
+        import logging
+        logger = logging.getLogger(__name__)
 
-        print(f"✅ GeminiLLM initialized with {self.model_name}")
-        print(f"   Temperature: {temperature}, Max tokens: {max_output_tokens}")
+        try:
+            logger.info(f"Creating GenerativeModel with {self.model_name}...")
+            print(f"🔄 Creating GenerativeModel with {self.model_name}...")
+
+            self.model = genai.GenerativeModel(
+                model_name=self.model_name,
+                generation_config=self.generation_config,
+                safety_settings=self.safety_settings
+            )
+
+            logger.info(f"GeminiLLM initialized with {self.model_name}")
+            logger.info(f"Temperature: {temperature}, Max tokens: {max_output_tokens}")
+            print(f"✅ GeminiLLM initialized with {self.model_name}")
+            print(f"   Temperature: {temperature}, Max tokens: {max_output_tokens}")
+
+        except Exception as e:
+            logger.error(f"Failed to create GenerativeModel: {e}")
+            print(f"❌ Failed to create GenerativeModel: {e}")
+            raise
 
     def generate(self, prompt: str, max_retries: int = 3) -> str:
         """
@@ -87,7 +101,43 @@ class GeminiLLM:
         for attempt in range(max_retries):
             try:
                 response = self.model.generate_content(prompt)
-                return response.text.strip()
+
+                # Check if response was blocked or has no content
+                if not response.candidates:
+                    raise ValueError("No response candidates returned by the model")
+
+                # Check finish reason
+                candidate = response.candidates[0]
+
+                # Try to safely get the text
+                try:
+                    response_text = response.text
+                except ValueError:
+                    # No text available
+                    response_text = None
+
+                if candidate.finish_reason == 1:  # STOP - successful completion
+                    if response_text:
+                        return response_text.strip()
+                    else:
+                        raise ValueError("Response completed but no text returned")
+                elif candidate.finish_reason == 2:  # MAX_TOKENS
+                    if response_text:
+                        return response_text.strip() + "... [Response truncated due to length]"
+                    else:
+                        raise ValueError("Response hit token limit. Try asking a shorter question or increase LLM_MAX_TOKENS in .env")
+                elif candidate.finish_reason == 3:  # SAFETY
+                    raise ValueError("Response blocked by safety filters. Try rephrasing the question.")
+                elif candidate.finish_reason == 4:  # RECITATION
+                    raise ValueError("Response blocked due to recitation concerns")
+                elif candidate.finish_reason == 5:  # OTHER
+                    raise ValueError("Response generation stopped for unknown reason")
+                else:
+                    # Fallback - try to get text anyway
+                    if response_text:
+                        return response_text.strip()
+                    else:
+                        raise ValueError(f"Unexpected finish_reason: {candidate.finish_reason}")
 
             except Exception as e:
                 if attempt < max_retries - 1:

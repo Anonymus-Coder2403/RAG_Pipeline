@@ -91,20 +91,24 @@ class RAGPipeline:
         Returns:
             Formatted prompt string
         """
-        return f"""You are a helpful assistant that answers questions based on the provided context.
+        return f"""You are an expert AI assistant analyzing documents to provide accurate, comprehensive answers.
 
-Context:
+DOCUMENT CONTEXT:
 {context}
 
-Question: {query}
+USER QUESTION: {query}
 
-Instructions:
-- Answer based ONLY on the information in the context above
-- If the context doesn't contain enough information, say so
-- Be concise but complete
-- Cite which source(s) you used
+INSTRUCTIONS FOR YOUR RESPONSE:
+1. Carefully analyze all the provided document context above
+2. Provide a clear, well-structured answer that directly addresses the user's question
+3. If multiple sources contain relevant information, synthesize them into a coherent response
+4. Use natural, conversational language while maintaining accuracy
+5. Explain concepts clearly - don't just extract text, but help the user understand
+6. After your answer, cite the specific sources you used in the format: (Source 1, Source 2, etc.)
+7. If the context doesn't contain sufficient information to fully answer the question, acknowledge this honestly
+8. Focus on being helpful and informative rather than overly brief
 
-Answer:"""
+Please provide your comprehensive answer now:"""
 
     def display_result(self, result: Dict):
         """

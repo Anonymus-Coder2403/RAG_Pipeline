@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+
+# Data (don't copy to image, use volumes)
+data/vector_store/
+data/uploads/
+data/pdf/*.pdf
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+*.md
+!README.md
+
+# Notebooks
+notebook/
+*.ipynb
+
+# Environment
+.env
+.env.example
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
