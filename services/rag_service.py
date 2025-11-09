@@ -47,6 +47,46 @@ class RAGService:
             logger.error(f"Failed to initialize RAG Service: {e}", exc_info=True)
             raise
 
+    def _load_document_by_type(self, file_path: Path):
+        """
+        Load document based on file extension
+
+        Args:
+            file_path: Path to document file
+
+        Returns:
+            List of LangChain Document objects
+
+        Raises:
+            ValueError: If file type is not supported
+        """
+        from langchain_community.document_loaders import (
+            PyPDFLoader,
+            TextLoader,
+            Docx2txtLoader
+        )
+
+        suffix = file_path.suffix.lower()
+
+        try:
+            if suffix == '.pdf':
+                logger.info(f"Loading PDF file: {file_path.name}")
+                loader = PyPDFLoader(str(file_path))
+            elif suffix == '.txt':
+                logger.info(f"Loading TXT file: {file_path.name}")
+                loader = TextLoader(str(file_path), encoding='utf-8')
+            elif suffix == '.docx':
+                logger.info(f"Loading DOCX file: {file_path.name}")
+                loader = Docx2txtLoader(str(file_path))
+            else:
+                raise ValueError(f"Unsupported file type: {suffix}. Supported types: .pdf, .txt, .docx")
+
+            return loader.load()
+
+        except Exception as e:
+            logger.error(f"Error loading {suffix} file: {e}", exc_info=True)
+            raise
+
     def process_document(
         self,
         file_path: Path,
@@ -65,18 +105,16 @@ class RAGService:
         try:
             logger.info(f"Processing document: {file_path.name}")
 
-            # Step 1: Load PDF directly (bypassing directory-based loader)
-            from langchain_community.document_loaders import PyPDFLoader
+            # Step 1: Load document based on file type
             from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-            # Load PDF pages
-            pdf_loader = PyPDFLoader(str(file_path))
-            raw_documents = pdf_loader.load()
+            # Load document using appropriate loader for file type
+            raw_documents = self._load_document_by_type(file_path)
 
             if not raw_documents:
-                return None, "No content extracted from PDF. The file may be image-based, encrypted, or corrupted."
+                return None, f"No content extracted from {file_path.suffix}. The file may be empty, corrupted, or image-based."
 
-            logger.info(f"Loaded {len(raw_documents)} pages from {file_path.name}")
+            logger.info(f"Loaded {len(raw_documents)} pages/sections from {file_path.name}")
 
             # Add source metadata
             for doc in raw_documents:

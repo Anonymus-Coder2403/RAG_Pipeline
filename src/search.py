@@ -4,7 +4,10 @@ Search/Retrieval Module
 This module handles query-based retrieval from the vector store.
 """
 
+import logging
 from typing import List, Dict, Any
+
+logger = logging.getLogger(__name__)
 
 
 class RAGRetriever:
@@ -38,15 +41,15 @@ class RAGRetriever:
         Returns:
             List of dictionaries containing retrieved documents and metadata
         """
-        print(f"Retrieving documents for query: '{query}'")
-        print(f"Top K: {top_k}, Score threshold: {score_threshold}")
+        logger.info(f"Retrieving documents for query: '{query[:50]}...'")
+        logger.debug(f"Retrieval parameters - Top K: {top_k}, Score threshold: {score_threshold}")
 
         # Generate query embedding
         query_embedding = self.embedding_manager.generate_embeddings([query], show_progress=False)[0]
 
         # Search in vector store
         try:
-            results = self.vector_store.collection.query(
+            results = self.vector_store.query(
                 query_embeddings=[query_embedding.tolist()],
                 n_results=top_k
             )
@@ -76,12 +79,12 @@ class RAGRetriever:
                             'rank': i + 1
                         })
 
-                print(f"Retrieved {len(retrieved_docs)} documents (after filtering)")
+                logger.info(f"Retrieved {len(retrieved_docs)} documents (after filtering)")
             else:
-                print("No documents found")
+                logger.warning("No documents found in vector store")
 
             return retrieved_docs
 
         except Exception as e:
-            print(f"Error during retrieval: {e}")
+            logger.error(f"Error during retrieval: {e}", exc_info=True)
             return []

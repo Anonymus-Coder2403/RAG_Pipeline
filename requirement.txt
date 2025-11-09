@@ -15,4 +15,5 @@ streamlit>=1.31.0
 
 # Additional utilities
 python-docx>=1.1.0
+docx2txt>=0.8
 Pillow>=10.0.0

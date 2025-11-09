@@ -55,12 +55,17 @@ class GeminiLLM:
             "max_output_tokens": max_output_tokens,
         }
 
-        # Safety settings - relaxed for document Q&A
+        # Safety settings - production-safe configuration
+        # BLOCK_MEDIUM_AND_ABOVE is recommended for production to prevent harmful content
+        # while still allowing most legitimate document Q&A use cases
+        # Use BLOCK_ONLY_HIGH for less restrictive filtering if needed
+        safety_threshold = "BLOCK_MEDIUM_AND_ABOVE"
+
         self.safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": safety_threshold},
         ]
 
         # Initialize model
